@@ -529,7 +529,7 @@ const NSString *_defaultPlayingRoute = @"speakers";
         success = [[AVAudioSession sharedInstance] setCategory:category withOptions:AVAudioSessionCategoryOptionMixWithOthers error:&error];
       } else {
         success = [[AVAudioSession sharedInstance] setCategory:category error:&error];
-        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+//        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents]; // 干掉，开启无法返回以前的播放的音频
       }
       
       if ([playerInfo[@"playingRoute"] isEqualToString:@"earpiece"]) {
@@ -782,6 +782,8 @@ recordingActive: (bool) recordingActive
     [ self seek:playerId time:CMTimeMake(0, 1) ];
     [playerInfo setObject:@false forKey:@"isPlaying"];
   }
+    NSError *error = nil;
+      [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
 }
 
 -(void) seek: (NSString *) playerId
@@ -824,7 +826,7 @@ recordingActive: (bool) recordingActive
 
   [ _channel_audioplayer invokeMethod:@"audio.onComplete" arguments:@{@"playerId": playerId}];
   NSError *error = nil;
-    [[AVAudioSession sharedInstance] setActive:NO error:&error];
+    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
   #if TARGET_OS_IPHONE
       if (headlessServiceInitialized) {
           [_callbackChannel invokeMethod:@"audio.onNotificationBackgroundPlayerStateChanged" arguments:@{@"playerId": playerId, @"updateHandleMonitorKey": @(_updateHandleMonitorKey), @"value": @"completed"}];
