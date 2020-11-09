@@ -153,21 +153,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       // TODO implemented for iOS, waiting for android impl
       if (Theme.of(context).platform == TargetPlatform.iOS) {
         // (Optional) listen for notification updates in the background
-        _audioPlayer.startHeadlessService();
+        // _audioPlayer.startHeadlessService();
 
         // set at least title to see the notification bar on ios.
-        _audioPlayer.setNotification(
-          title: 'App Name',
-          artist: 'Artist or blank',
-          albumTitle: 'Name or blank',
-          imageUrl: 'url or blank',
-          // forwardSkipInterval: const Duration(seconds: 30), // default is 30s
-          // backwardSkipInterval: const Duration(seconds: 30), // default is 30s
-          duration: duration,
-          elapsedTime: Duration(seconds: 0),
-          hasNextTrack: true,
-          hasPreviousTrack: false,
-        );
+        // _audioPlayer.setNotification(
+        //   title: 'App Name',
+        //   artist: 'Artist or blank',
+        //   albumTitle: 'Name or blank',
+        //   imageUrl: 'url or blank',
+        //   // forwardSkipInterval: const Duration(seconds: 30), // default is 30s
+        //   // backwardSkipInterval: const Duration(seconds: 30), // default is 30s
+        //   duration: duration,
+        //   elapsedTime: Duration(seconds: 0),
+        //   hasNextTrack: true,
+        //   hasPreviousTrack: false,
+        // );
       }
     });
 
@@ -220,7 +220,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             _position.inMilliseconds < _duration.inMilliseconds)
         ? _position
         : null;
-    final result = await _audioPlayer.play(url, position: playPosition);
+    final result = await _audioPlayer.play(url, position: playPosition, duckAudio: false);
     if (result == 1) setState(() => _playerState = PlayerState.playing);
 
     // default playback rate is 1.0

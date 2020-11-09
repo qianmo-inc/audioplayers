@@ -12,6 +12,7 @@ NSString *const AudioplayersPluginStop = @"AudioplayersPluginStop";
 
 
 static NSMutableDictionary * players;
+static NSMutableDictionary * duckPlayers;
 
 @interface AudioplayersPlugin()
 -(void) pause: (NSString *) playerId;
@@ -72,6 +73,7 @@ const NSString *_defaultPlayingRoute = @"speakers";
   if (self) {
       _isDealloc = false;
       players = [[NSMutableDictionary alloc] init];
+      duckPlayers = [[NSMutableDictionary alloc] init];
       [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needStop) name:AudioplayersPluginStop object:nil];
 
     #if TARGET_OS_IPHONE
@@ -515,7 +517,7 @@ const NSString *_defaultPlayingRoute = @"speakers";
       // code moved from play() to setUrl() to fix the bug of audio not playing in ios background
       NSError *error = nil;
       BOOL success = false;
-    
+
       AVAudioSessionCategory category;
       if (recordingActive) {
         category = AVAudioSessionCategoryPlayAndRecord;
@@ -531,7 +533,7 @@ const NSString *_defaultPlayingRoute = @"speakers";
         success = [[AVAudioSession sharedInstance] setCategory:category error:&error];
 //        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents]; // 干掉，开启无法返回以前的播放的音频
       }
-      
+
       if ([playerInfo[@"playingRoute"] isEqualToString:@"earpiece"]) {
         // Use earpiece speaker to play audio.
         success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
@@ -613,16 +615,9 @@ recordingActive: (bool) recordingActive
   AVAudioSessionCategory category = respectSilence ? AVAudioSessionCategoryAmbient : AVAudioSessionCategoryPlayback;
     
   BOOL success = false;
-  if (duckAudio) {
-    success = [[AVAudioSession sharedInstance]
-                    setCategory: category
-            withOptions: AVAudioSessionCategoryOptionDuckOthers
-                    error:&error];
-  } else {
     success = [[AVAudioSession sharedInstance]
                     setCategory: category
                     error:&error];
-  }
 
   if (!success) {
     NSLog(@"Error setting speaker: %@", error);
@@ -652,6 +647,9 @@ recordingActive: (bool) recordingActive
   ];
   #if TARGET_OS_IPHONE
     _currentPlayerId = playerId; // to be used for notifications command center
+    if (duckAudio) {
+        duckPlayers[playerId] = playerId;
+    }
   #endif
 }
 
@@ -782,8 +780,10 @@ recordingActive: (bool) recordingActive
     [ self seek:playerId time:CMTimeMake(0, 1) ];
     [playerInfo setObject:@false forKey:@"isPlaying"];
   }
-    NSError *error = nil;
-      [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    if (duckPlayers[playerId] != nil) {
+        NSError *error = nil;
+          [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    }
 }
 
 -(void) seek: (NSString *) playerId

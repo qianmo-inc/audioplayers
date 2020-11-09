@@ -39,12 +39,12 @@ class _ExampleAppState extends State<ExampleApp> {
       // Calls to Platform.isIOS fails on web
       return;
     }
-    if (Platform.isIOS) {
-      if (audioCache.fixedPlayer != null) {
-        audioCache.fixedPlayer.startHeadlessService();
-      }
-      advancedPlayer.startHeadlessService();
-    }
+    // if (Platform.isIOS) {
+    //   if (audioCache.fixedPlayer != null) {
+    //     audioCache.fixedPlayer.startHeadlessService();
+    //   }
+    //   advancedPlayer.startHeadlessService();
+    // }
   }
 
   Future _loadFile() async {
