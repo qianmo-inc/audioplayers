@@ -615,9 +615,9 @@ recordingActive: (bool) recordingActive
   AVAudioSessionCategory category = respectSilence ? AVAudioSessionCategoryAmbient : AVAudioSessionCategoryPlayback;
     
   BOOL success = false;
-    success = [[AVAudioSession sharedInstance]
-                    setCategory: category
-                    error:&error];
+  success = [[AVAudioSession sharedInstance]
+                setCategory: category
+                error:&error];
 
   if (!success) {
     NSLog(@"Error setting speaker: %@", error);
@@ -780,9 +780,12 @@ recordingActive: (bool) recordingActive
     [ self seek:playerId time:CMTimeMake(0, 1) ];
     [playerInfo setObject:@false forKey:@"isPlaying"];
   }
+    
+    NSError *error = nil;
     if (duckPlayers[playerId] != nil) {
-        NSError *error = nil;
           [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    } else {
+        [[AVAudioSession sharedInstance] setActive:NO error:&error];
     }
 }
 
