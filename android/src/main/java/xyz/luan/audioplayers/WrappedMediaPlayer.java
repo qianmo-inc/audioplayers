@@ -275,14 +275,12 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
     @Override
     @SuppressWarnings("deprecation")
     void stop() {
-        if (this.duckAudio) {
-            AudioManager audioManager = getAudioManager();
+        AudioManager audioManager = getAudioManager();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                audioManager.abandonAudioFocusRequest(audioFocusRequest);
-            } else {
-                audioManager.abandonAudioFocus(audioFocusChangeListener);
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.abandonAudioFocusRequest(audioFocusRequest);
+        } else {
+            audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
 
         if (this.released) {
