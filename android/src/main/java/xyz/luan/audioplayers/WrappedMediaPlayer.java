@@ -11,6 +11,8 @@ import android.os.PowerManager;
 
 import java.io.IOException;
 
+import io.flutter.Log;
+
 public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnSeekCompleteListener, MediaPlayer.OnErrorListener {
 
     private String playerId;
@@ -219,9 +221,8 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
     void play(final Context context) {
         this.context = context;
         AudioManager audioManager = getAudioManager();
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            audioFocusRequest = new AudioFocusRequest.Builder(duckAudio ? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK : AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+            audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
                     .setAudioAttributes(
                             new AudioAttributes.Builder()
                                     .setUsage(respectSilence ? AudioAttributes.USAGE_NOTIFICATION_RINGTONE : AudioAttributes.USAGE_MEDIA)
@@ -234,14 +235,17 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
                             actuallyPlay(context);
                         }
                     }).build();
-            audioManager.requestAudioFocus(audioFocusRequest);
+            int result = audioManager.requestAudioFocus(audioFocusRequest);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                actuallyPlay(context);
+            }
         } else {
             // Request audio focus for playback
             int result = audioManager.requestAudioFocus(audioFocusChangeListener,
                     // Use the music stream.
                     AudioManager.STREAM_MUSIC,
                     // Request permanent focus.
-                    duckAudio ? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK : AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
 
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 actuallyPlay(context);
@@ -271,12 +275,14 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
     @Override
     @SuppressWarnings("deprecation")
     void stop() {
-        AudioManager audioManager = getAudioManager();
+        if (this.duckAudio) {
+            AudioManager audioManager = getAudioManager();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            audioManager.abandonAudioFocusRequest(audioFocusRequest);
-        } else {
-            audioManager.abandonAudioFocus(audioFocusChangeListener);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                audioManager.abandonAudioFocusRequest(audioFocusRequest);
+            } else {
+                audioManager.abandonAudioFocus(audioFocusChangeListener);
+            }
         }
 
         if (this.released) {
