@@ -783,7 +783,6 @@ recordingActive: (bool) recordingActive
     [playerInfo setObject:@false forKey:@"isPlaying"];
   }
     NSNumber * isDuck = duckPlayers[playerId];
-    NSLog(@"=================%@", playerId);
     NSError *error = nil;
     if (isDuck == [NSNumber numberWithInt:1]) {
           [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
@@ -831,8 +830,13 @@ recordingActive: (bool) recordingActive
   }
 
   [ _channel_audioplayer invokeMethod:@"audio.onComplete" arguments:@{@"playerId": playerId}];
-  NSError *error = nil;
-    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    NSNumber * isDuck = duckPlayers[playerId];
+    NSError *error = nil;
+    if (isDuck == [NSNumber numberWithInt:1]) {
+          [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    } else {
+        [[AVAudioSession sharedInstance] setActive:NO error:&error];
+    }
   #if TARGET_OS_IPHONE
       if (headlessServiceInitialized) {
           [_callbackChannel invokeMethod:@"audio.onNotificationBackgroundPlayerStateChanged" arguments:@{@"playerId": playerId, @"updateHandleMonitorKey": @(_updateHandleMonitorKey), @"value": @"completed"}];
