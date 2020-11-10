@@ -225,7 +225,7 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
             audioFocusRequest = new AudioFocusRequest.Builder(this.duckAudio ? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT : AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(
                             new AudioAttributes.Builder()
-                                    .setUsage(respectSilence ? AudioAttributes.USAGE_NOTIFICATION_RINGTONE : AudioAttributes.USAGE_MEDIA)
+                                    .setUsage(respectSilence ? AudioAttributes.USAGE_NOTIFICATION : AudioAttributes.USAGE_MEDIA)
                                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                                     .build()
                     )
@@ -243,7 +243,7 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
             // Request audio focus for playback
             int result = audioManager.requestAudioFocus(audioFocusChangeListener,
                     // Use the music stream.
-                    AudioManager.STREAM_MUSIC,
+                    respectSilence ? AudioManager.STREAM_NOTIFICATION : AudioManager.STREAM_MUSIC,
                     // Request permanent focus.
                     this.duckAudio ? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT : AudioManager.AUDIOFOCUS_GAIN);
 
