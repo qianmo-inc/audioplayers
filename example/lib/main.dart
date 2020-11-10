@@ -27,7 +27,7 @@ class ExampleApp extends StatefulWidget {
 }
 
 class _ExampleAppState extends State<ExampleApp> {
-  AudioCache audioCache = AudioCache();
+  AudioCache audioCache = AudioCache(respectSilence: true);
   AudioPlayer advancedPlayer = AudioPlayer();
   String localFilePath;
 

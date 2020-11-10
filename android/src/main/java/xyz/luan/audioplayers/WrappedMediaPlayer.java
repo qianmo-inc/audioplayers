@@ -435,7 +435,7 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (objectEquals(this.playingRoute, "speakers")) {
                 player.setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(respectSilence ? AudioAttributes.USAGE_NOTIFICATION_RINGTONE : AudioAttributes.USAGE_MEDIA)
+                        .setUsage(respectSilence ? AudioAttributes.USAGE_NOTIFICATION : AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build()
                 );
@@ -456,7 +456,7 @@ public class WrappedMediaPlayer extends Player implements MediaPlayer.OnPrepared
         } else {
             // This method is deprecated but must be used on older devices
             if (objectEquals(this.playingRoute, "speakers")) {
-                player.setAudioStreamType(respectSilence ? AudioManager.STREAM_RING : AudioManager.STREAM_MUSIC);
+                player.setAudioStreamType(respectSilence ? AudioManager.STREAM_NOTIFICATION : AudioManager.STREAM_MUSIC);
             } else {
                 player.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
             }
