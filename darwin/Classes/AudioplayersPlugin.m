@@ -647,7 +647,9 @@ recordingActive: (bool) recordingActive
   ];
   #if TARGET_OS_IPHONE
     _currentPlayerId = playerId; // to be used for notifications command center
-    duckPlayers[playerId] = playerId;
+    if (duckAudio) {
+        duckPlayers[playerId] = playerId;
+    }
   #endif
 }
 
@@ -780,12 +782,12 @@ recordingActive: (bool) recordingActive
   }
     NSString * duckPlayer = duckPlayers[playerId];
     NSLog(@"=================%@", duckPlayer);
-//    NSError *error = nil;
-//    if (duckPlayer != nil) {
-//          [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
-//    } else {
-//        [[AVAudioSession sharedInstance] setActive:NO error:&error];
-//    }
+    NSError *error = nil;
+    if (duckPlayer != nil) {
+          [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&error];
+    } else {
+        [[AVAudioSession sharedInstance] setActive:NO error:&error];
+    }
 }
 
 -(void) seek: (NSString *) playerId
