@@ -172,6 +172,7 @@ class AudioCache {
     bool isNotification,
     PlayerMode mode = PlayerMode.MEDIA_PLAYER,
     bool stayAwake = false,
+    bool duckAudio,
   }) async {
     String url = await getAbsoluteUrl(fileName);
     AudioPlayer player = _player(mode);
@@ -181,6 +182,7 @@ class AudioCache {
       volume: volume,
       respectSilence: isNotification ?? respectSilence,
       stayAwake: stayAwake,
+      duckAudio: duckAudio ?? this.duckAudio,
     );
     return player;
   }
