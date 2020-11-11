@@ -711,6 +711,22 @@ class AudioPlayer {
     players.remove(playerId);
   }
 
+  Future<int> setEarpieceOrSpeakers(PlayingRouteState state) async {
+    if (state == _playingRouteState) return 0;
+
+    final playingRouteName = state == PlayingRouteState.EARPIECE ? 'earpiece' : 'speakers';
+    final int result = await _invokeMethod(
+      'earpieceOrSpeakersToggle',
+      {'playingRoute': playingRouteName},
+    );
+
+    if (result == 1) {
+      playingRouteState = state;
+    }
+
+    return result;
+  }
+
   Future<int> earpieceOrSpeakersToggle() async {
     PlayingRouteState playingRoute =
         _playingRouteState == PlayingRouteState.EARPIECE
